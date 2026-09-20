@@ -15,6 +15,7 @@ peteggConf={"DisName","ZhName","PoolOnlyTag","tp","pool","weight","cost","price"
 settingConf={"ZhName","ShowName","SetType","TempType","set","range","isPecent","ZhDes","isShow","mobieFade"},
 skillConf={"ZhName","ScriptName","","","Icon","Priority","Range","EffectTarget","needCheck","isBase","exp","","ElementTp","AttackEffectPos","CD","DamageRate","","buffs","","","","ForceHitAnimation","Size","Band","SummonBand"},
 updatelogConf={"UpdateTime","ZhTagTitle","ZhUpdateText"},
+weaponConf={"tp","ZhName","Model","Damage","Icon","Sort","Price","InShop","xyd"},
 }
 
 ConfigInstance.buffdataConf={
@@ -150,5 +151,11 @@ ConfigInstance.skillConf={
 
 ConfigInstance.updatelogConf={
 	[1]={1778839200,"更新_页签标题_1",{"更新_内容标题_1","更新_内容_1_1","更新_内容_1_2","更新_内容_1_3"}}
+}
+
+ConfigInstance.weaponConf={
+	[100000001]={10,"大剑","大剑",1,17744927818,1,0,1,3},
+	[100000002]={10,"大剑2","大剑",2,17744925782,2,320,1,4},
+	[100000003]={10,"大剑3","大剑",4,17744927818,3,1600,1,5}
 }
 return ConfigInstance
