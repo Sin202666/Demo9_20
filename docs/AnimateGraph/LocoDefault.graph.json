@@ -1,0 +1,187 @@
+{
+  "name": "LocoDefault",
+  "styleId": "Default",
+  "version": 1,
+  "created": "2026-08-31",
+  "publishedAssetId": 90774329769612,
+  "publishedAnimationId": "rbxassetid://90774329769612",
+  "priority": "Movement",
+  "source": {
+    "clips": "src/ReplicatedFirst/AllSideCode/ToolSystem/AnimationModule/Animation.luau",
+    "slots": "src/ReplicatedFirst/AllSideCode/ToolSystem/LocoStyleSets.luau",
+    "fsm": "src/StarterPlayer/StarterCharacterScripts/Animate/GroundLocomotion.luau",
+    "blend": "src/StarterPlayer/StarterCharacterScripts/Animate/StrafeBlend.luau",
+    "timing": "src/StarterPlayer/StarterCharacterScripts/Animate/AnimateSetting.luau"
+  },
+  "notes": [
+    "Studio: Avatar → Graph Editor → Create Graph，按 nodes 搭完后 Publish，得到 rbxassetid。",
+    "本文件不是引擎可加载资产。未改 Animate 业务代码；驱动仍由脚本 SetParameter。",
+    "整图一条 AnimationTrack。Land 不再独占 Action 档；若业务 Idle 用 Action 会盖落地，P2 再拆。",
+    "StopWalk 已接 Select 针 StopWalk（OnceAndHold）。现网 TransitionEnable.StopWalk=false，脚本暂不写该 LocoState；打开开关后即可播，无需改图。",
+    "RunBack 与 WalkBack 当前共用同一 AssetId（Animation.luau 原样）。",
+    "AirLean / ShiftLock 偏航 / ActionArbiter / FOV 不进图。"
+  ],
+  "parameters": [
+    {
+      "name": "LocoState",
+      "type": "String",
+      "default": "Idle",
+      "values": ["Idle", "StartWalk", "Walk", "StartRun", "Run", "StopRun", "StopWalk", "Jump", "Fall", "Land", "LightLand", "Climb", "Swim", "SwimIdle"],
+      "drive": "Select.Selection。值须等于 GroundLocomotion._pose / 现 BasePos。"
+    },
+    {
+      "name": "MoveYawRad",
+      "type": "Number",
+      "default": 0,
+      "unit": "studioDegrees_runtimeRadians",
+      "drive": "Studio采样点是角度(0/90/180/-90)。运行时 SetParameter 必须 math.rad(-getMoveYaw())：弧度且左右取负。不要把度数直接喂图。"
+    },
+    {
+      "name": "MoveMag",
+      "type": "Number",
+      "default": 1,
+      "drive": "Walk/Run Blend2D.Y（Polar）。走跑态保持 1；换键归零时脚本 hold 上一 yaw，勿把 Mag 打到 0。"
+    },
+    {
+      "name": "ClipSpeed",
+      "type": "Number",
+      "default": 1,
+      "drive": "Walk/Run/Climb 外包 Speed 节点。Walk=speed/15、Run=speed/21、Climb=speed/20，再除 RigScale。"
+    }
+  ],
+  "clips": {
+    "Idle": { "logic": "Idle", "id": 73017323943165, "playMode": "Loop", "looped": true },
+    "WalkForward": { "logic": "WalkForward", "id": 139654422461240, "playMode": "Loop", "marker": "FootStep" },
+    "WalkLeft": { "logic": "WalkLeft", "id": 119106930873594, "playMode": "Loop", "marker": "FootStep" },
+    "WalkRight": { "logic": "WalkRight", "id": 74286139489224, "playMode": "Loop", "marker": "FootStep" },
+    "WalkBack": { "logic": "WalkBack", "id": 91745560081619, "playMode": "Loop", "marker": "FootStep" },
+    "RunForward": { "logic": "RunForward", "id": 126394617080362, "playMode": "Loop", "marker": "FootStep" },
+    "RunLeft": { "logic": "RunLeft", "id": 115864488601800, "playMode": "Loop", "marker": "FootStep" },
+    "RunRight": { "logic": "RunRight", "id": 80771194323564, "playMode": "Loop", "marker": "FootStep" },
+    "RunBack": { "logic": "RunBack", "id": 91745560081619, "playMode": "Loop", "marker": "FootStep", "sameAs": "WalkBack" },
+    "StartWalk": { "logic": "StartWalk", "id": 83627064347968, "playMode": "OnceAndHold", "looped": false },
+    "StartRun": { "logic": "StartRun", "id": 110076234433144, "playMode": "OnceAndHold", "looped": false },
+    "StopRun": { "logic": "StopRun", "id": 74711175308982, "playMode": "OnceAndHold", "looped": false },
+    "StopWalk": { "logic": "StopWalk", "id": 131876402162668, "playMode": "OnceAndHold", "looped": false, "enabled": true },
+    "Jump": { "logic": "Jump", "id": 74574734044792, "playMode": "Loop" },
+    "Fall": { "logic": "Fall", "id": 80109568260492, "playMode": "Loop" },
+    "Land": { "logic": "Land", "id": 79155093635462, "playMode": "OnceAndHold" },
+    "LightLand": { "logic": "LightLand", "id": 95077157938466, "playMode": "OnceAndHold" },
+    "Climb": { "logic": "Climb", "id": 180436334, "playMode": "Loop" },
+    "Swim": { "logic": "Swim", "id": 127117575260465, "playMode": "Loop" },
+    "SwimIdle": { "logic": "SwimIdle", "id": 123064778192220, "playMode": "Loop" }
+  },
+  "blend2d": {
+    "type": "Blend2D",
+    "inputMode": "Polar",
+    "phaseSync": "Synced",
+    "studioPins": { "Angle": "MoveYawRad", "Magnitude": "MoveMag" },
+    "angleUnit": "degrees",
+    "xParam": "MoveYawRad",
+    "yParam": "MoveMag",
+    "uiNote": "Polar 绿针叫 Angle / Magnitude。Angle 在 Studio 里是角度（官方文档曾写 radians，以编辑器为准）。",
+    "samples": {
+      "Forward": { "angle": 0, "magnitude": 1 },
+      "Right": { "angle": 90, "magnitude": 1 },
+      "Back": { "angle": 180, "magnitude": 1 },
+      "Left": { "angle": -90, "magnitude": 1 }
+    },
+    "whyPolar": "Polar 偏重方向、弱化对立向插值，对齐 StrafeBlend 禁止前↔后 / 左↔右双轨。"
+  },
+  "nodes": [
+    { "id": "clip_Idle", "type": "Clip", "clip": "Idle" },
+    { "id": "clip_WalkF", "type": "Clip", "clip": "WalkForward" },
+    { "id": "clip_WalkL", "type": "Clip", "clip": "WalkLeft" },
+    { "id": "clip_WalkR", "type": "Clip", "clip": "WalkRight" },
+    { "id": "clip_WalkB", "type": "Clip", "clip": "WalkBack" },
+    { "id": "clip_RunF", "type": "Clip", "clip": "RunForward" },
+    { "id": "clip_RunL", "type": "Clip", "clip": "RunLeft" },
+    { "id": "clip_RunR", "type": "Clip", "clip": "RunRight" },
+    { "id": "clip_RunB", "type": "Clip", "clip": "RunBack" },
+    { "id": "clip_StartWalk", "type": "Clip", "clip": "StartWalk" },
+    { "id": "clip_StartRun", "type": "Clip", "clip": "StartRun" },
+    { "id": "clip_StopRun", "type": "Clip", "clip": "StopRun" },
+    { "id": "clip_StopWalk", "type": "Clip", "clip": "StopWalk" },
+    { "id": "clip_Jump", "type": "Clip", "clip": "Jump" },
+    { "id": "clip_Fall", "type": "Clip", "clip": "Fall" },
+    { "id": "clip_Land", "type": "Clip", "clip": "Land" },
+    { "id": "clip_LightLand", "type": "Clip", "clip": "LightLand" },
+    { "id": "clip_Climb", "type": "Clip", "clip": "Climb" },
+    { "id": "clip_Swim", "type": "Clip", "clip": "Swim" },
+    { "id": "clip_SwimIdle", "type": "Clip", "clip": "SwimIdle" },
+    {
+      "id": "blend_Walk",
+      "type": "Blend2D",
+      "inputs": [
+        { "pin": "Forward", "from": "clip_WalkF", "angle": 0, "magnitude": 1 },
+        { "pin": "Right", "from": "clip_WalkR", "angle": 90, "magnitude": 1 },
+        { "pin": "Back", "from": "clip_WalkB", "angle": 180, "magnitude": 1 },
+        { "pin": "Left", "from": "clip_WalkL", "angle": -90, "magnitude": 1 }
+      ]
+    },
+    {
+      "id": "blend_Run",
+      "type": "Blend2D",
+      "inputs": [
+        { "pin": "Forward", "from": "clip_RunF", "angle": 0, "magnitude": 1 },
+        { "pin": "Right", "from": "clip_RunR", "angle": 90, "magnitude": 1 },
+        { "pin": "Back", "from": "clip_RunB", "angle": 180, "magnitude": 1 },
+        { "pin": "Left", "from": "clip_RunL", "angle": -90, "magnitude": 1 }
+      ]
+    },
+    { "id": "speed_Walk", "type": "Speed", "from": "blend_Walk", "speedParam": "ClipSpeed" },
+    { "id": "speed_Run", "type": "Speed", "from": "blend_Run", "speedParam": "ClipSpeed" },
+    { "id": "speed_Climb", "type": "Speed", "from": "clip_Climb", "speedParam": "ClipSpeed" },
+    {
+      "id": "select_Loco",
+      "type": "Select",
+      "selectionParam": "LocoState",
+      "defaultTransition": { "duration": 0.18, "curve": "Linear" },
+      "inputs": [
+        { "pin": "Idle", "from": "clip_Idle", "toDuration": 0.196 },
+        { "pin": "StartWalk", "from": "clip_StartWalk", "toDuration": 0.2 },
+        { "pin": "Walk", "from": "speed_Walk", "toDuration": 0.12 },
+        { "pin": "StartRun", "from": "clip_StartRun", "toDuration": 0.158 },
+        { "pin": "Run", "from": "speed_Run", "toDuration": 0.12 },
+        { "pin": "StopRun", "from": "clip_StopRun", "toDuration": 0.098 },
+        { "pin": "StopWalk", "from": "clip_StopWalk", "toDuration": 0.1 },
+        { "pin": "Jump", "from": "clip_Jump", "toDuration": 0.18 },
+        { "pin": "Fall", "from": "clip_Fall", "toDuration": 0.18 },
+        { "pin": "Land", "from": "clip_Land", "toDuration": 0.18 },
+        { "pin": "LightLand", "from": "clip_LightLand", "toDuration": 0.18 },
+        { "pin": "Climb", "from": "speed_Climb", "toDuration": 0.18 },
+        { "pin": "Swim", "from": "clip_Swim", "toDuration": 0.18 },
+        { "pin": "SwimIdle", "from": "clip_SwimIdle", "toDuration": 0.18 }
+      ],
+      "extraOverrides": [
+        { "from": "Land", "to": "Walk", "duration": 0.08 },
+        { "from": "Land", "to": "Run", "duration": 0.08 },
+        { "from": "LightLand", "to": "Walk", "duration": 0.08 },
+        { "from": "LightLand", "to": "Run", "duration": 0.08 },
+        { "from": "StartRun", "to": "Run", "duration": 0.2 },
+        { "from": "StartWalk", "to": "Walk", "duration": 0.15 },
+        { "from": "StopRun", "to": "Idle", "duration": 0.15 },
+        { "from": "StopWalk", "to": "Idle", "duration": 0.1 },
+        { "from": "Walk", "to": "Run", "duration": 0.12 },
+        { "from": "Run", "to": "Walk", "duration": 0.12 }
+      ]
+    },
+    { "id": "out", "type": "GraphOutput", "from": "select_Loco" }
+  ],
+  "driver": {
+    "setParameter": {
+      "LocoState": "与现 _pose 同名；SkipStart / 侧移直切时直接写 Walk 或 Run，不要写 Start*。",
+      "MoveYawRad": "getMoveYaw() 为角度。SetParameter 用 math.rad(-yawDeg)（运行时弧度，左右取负）。无输入 keep last。Studio 采样点仍是角度。",
+      "MoveMag": "走跑态恒 1；Idle/空中可 1 或不管（Select 已离开 Blend2D）。",
+      "ClipSpeed": "getRunAnimationSpeed(speed, Walk|Run|Climb)"
+    },
+    "commitStillInScript": {
+      "StartRun": 0.2975,
+      "StartWalk": 0.36,
+      "StopRun": 0.252,
+      "reason": "commit 必须与 CharacterMoveSpeed / MotionPhase 同相；Graph Sequence 不负责位移钟。"
+    },
+    "pauseBase": "ActionArbiter.pauseBaseTracks 时 Stop 整张 Graph，解闸 Play + 立刻 SetParameter 当前态（不播 Start*）。",
+    "markers": "Blend2D 只转发最高权重轨的 FootStep，对齐 CanEmitFootStepFrom(leader)。"
+  }
+}

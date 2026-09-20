@@ -1,0 +1,36 @@
+# Argon
+/sourcemap.json
+
+# Wally
+/Packages
+/ServerPackages
+/DevPackages
+
+# Artifacts
+/*.lock
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+!src/ReplicatedStorage/Assets/ScreenGui/ShortVideoScreen.rbxmx
+
+# Misc
+.DS_Store
+
+# Excel lock files (Office temp)
+~$*.xlsx
+config/~$*
+
+# config build output (local only; do not commit)
+/config/.build/
+
+# ugit hook runtime (local only, never commit)
+scripts/ugit/precommit-last*
+scripts/ugit/prepush-last*
+scripts/ugit/premergecommit-last*
+scripts/ugit/ugit-real-git.txt
+scripts/ugit/__pycache__/
+scripts/ugit/*.pyc
+
+scripts/ugit/.build
+

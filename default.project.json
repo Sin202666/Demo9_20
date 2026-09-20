@@ -1,0 +1,49 @@
+{
+  "name": "Demo_9_20",
+  "servePlaceIds": [
+    106047768189792
+  ],
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedFirst": {
+      "AllSideCode": {
+        "$path": "src/ReplicatedFirst/AllSideCode"
+      }
+    },
+   "ReplicatedStorage": {
+      "ClientSideCode": {
+        "$path": "src/ReplicatedStorage/ClientSideCode"
+      },
+      "ShortVideoFeature": {
+        "$path": "src/ReplicatedStorage/ShortVideoFeature"
+      },
+      "MoonAnimator2Script": {
+        "$path": "src/ReplicatedStorage/MoonAnimator2Script"
+      }
+    },
+    "ServerScriptService": {
+      "InitGame": {
+        "$path": "src/ServerScriptService/InitGame"
+      },
+      "ShortVideoFeature": {
+        "$path": "src/ServerScriptService/ShortVideoFeature"
+      }
+    },
+    "ServerStorage": {
+      "ServerSideCode": {
+        "$path": "src/ServerStorage/ServerSideCode"
+      },
+      "GameAnalytics": {
+        "$path": "src/ServerStorage/GameAnalytics"
+      }
+    },
+    "StarterPlayer": {
+      "StarterCharacterScripts": {
+        "$path": "src/StarterPlayer/StarterCharacterScripts"
+      },
+      "StarterPlayerScripts": {
+        "$path": "src/StarterPlayer/StarterPlayerScripts"
+      }
+    }
+  }
+}

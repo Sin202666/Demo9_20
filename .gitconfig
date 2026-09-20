@@ -1,0 +1,6 @@
+# Repo Git defaults. Applied after running scripts/ugit/1-安装或更新打表钩子.bat
+# (.git/config: include.path = ../.gitconfig)
+[pull]
+	rebase = true
+[rebase]
+	autoStash = true

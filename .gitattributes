@@ -1,0 +1,27 @@
+# 统一文本文件行尾为 LF（覆盖 Windows 上 core.autocrlf）
+* text=auto eol=lf
+
+# 明确按文本处理的常见源码/配置
+*.luau text eol=lf
+*.lua text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.txt text eol=lf
+*.project.json text eol=lf
+
+# cmd.exe 解析 .bat 需要 CRLF；LF 会拆坏 FOR / %~fI
+*.bat text eol=crlf
+
+# 二进制保持原样
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.rbxl binary
+*.rbxlx binary
+*.rbxm binary
+*.rbxmx binary

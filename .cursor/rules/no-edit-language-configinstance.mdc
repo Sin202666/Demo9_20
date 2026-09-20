@@ -1,0 +1,23 @@
+---
+description: 禁止直接修改 Language / ConfigInstance 生成表；文案与配置由 Excel 打表生成
+alwaysApply: true
+---
+
+# 禁止直接改 Language / ConfigInstance
+
+Agent **不得** 直接编辑、覆盖或批量改写以下文件（含局部补丁）：
+
+- `src/ReplicatedFirst/AllSideCode/ToolBasic/TranslationHelper/Language.luau`
+- `src/ReplicatedFirst/AllSideCode/ToolBasic/ConfigInstance.luau`
+
+二者都是打表产物。完整约定见 `docs/文本本地化开发规范.md`。
+
+## 正确做法
+
+- 需要新翻译键 / 改文案：同一改动写入 `config/Localization/LocalizationTable.xlsx`（中英都填；策划未译的格子加 `/e`）。不便改 Excel 时，在回复里给出完整行由人写入。**不要**手改 `Language.luau`。
+- 需要新配置条目：改 `config/*.xlsx`，由钩子生成 `ConfigInstance.luau`。不便改 Excel 时，给出建议字段与示例由人写入。**不要**手改 `ConfigInstance.luau`。
+- 业务代码可用已有 Key、通过 `GameConfig` / `CfgFind` / `SystemGameConfig` 等读配置；不要为了“顺便补全”去动上述两表。
+
+## 例外
+
+仅当用户在本轮对话中 **明确点名** 允许修改上述某一文件时，才可编辑该文件；未点名则一律禁止。

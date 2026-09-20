@@ -1,0 +1,120 @@
+---
+description: 
+alwaysApply: true
+---
+
+# Roblox/Luau Dev Rules
+
+## Architecture & Placement
+- Place code in correct layer; never write cross-layer logic.
+- `AllSideCode`: shared utils/types; no server-authoritative logic, no UI rendering.
+- `ToolBasic`: stateless pure utils only.
+- `ToolSystem`: shared business tools; no server-authoritative state mutation.
+- `ServerSideCode/System`: server-authoritative business logic only.
+- `ClientSideCode/SystemModule`: client systems; no save/authoritative state.
+- `GuiScripts`: UI only; never mutate server-authoritative data locally.
+- `InitGame/Manager` / `StarterPlayerScripts/Manager`: thin orchestration—startup, event binding, routing. No complex business, no direct DataStore.
+- `ReplicatedStorage/Msg`: communication instances only; no business scripts.
+- Split server/client into separate modules. **Never** use `IsServer` branches for business logic in one System.
+- Manager routes/calls System. System owns domain logic. System must not bind Remote or touch UI directly.
+
+## Authority & Single Writer (P0)
+
+**Client-authoritative settlement — severe warn + refuse.** If code or a request makes the client the source of truth for rewards, inventory, currency, damage, kills, loot, quest/stage complete, spawn, or shop, you MUST (1) stop and issue a **severe P0 warning** that this enables resource duping / damage spoofing / fake kills, (2) refuse to implement that design, (3) redirect to server-authoritative settlement with optional client prediction/FX. "It's only for testing / we'll fix later" is not an exception. Not client-authoritative (do not false-alarm): UI/FX/interpolation; input prediction with server finality; Roblox character `NetworkOwnership` **with** server envelope (`SystemCharacterMotion`) — never use client-reported `CFrame` as reward or hit evidence. Docs: 结构规范 §1.6.
+
+**Exclusive write ownership — severe warn + refuse extra writers.** If multiple independent sources would set the same entity's position / `CFrame` / velocity / `WalkSpeed` / `Store.cframe` without a documented compositor or arbiter, you MUST (1) issue a **severe P0 warning** (last-writer-wins, rubber-band, combat desync), (2) refuse to add a second writer, (3) route through the existing owner: player planar speed → `CharacterMotion` Compose(Drive+Impulse); logical-enemy pose → `LogicEntityMotion` / `EnemySim` (client LocalMonster interpolates only); control locks → `ActionArbiter` / `PushLock`. Allowed: multiple *inputs* into one compositor; presentation that does not write authority; teleport by the sole authority module that cancels in-flight motion. New motion work must answer: who writes, how mutex/compose works, who clears state on interrupt. Docs: 结构规范 §1.7.
+
+## Plan Second-Review Gate (P0)
+
+**No implementation until the plan passes a second review.** After a scheme/plan is drafted, you MUST NOT start writing business code in the same turn. Run a **separate** second review against 结构规范 §1.2–1.4, **§1.6**, **§1.7**, Remote/save paths, and open questions. Output an explicit verdict: 通过 / 有条件通过（conditions written back into the plan）/ 不通过. Then **wait** for the user to explicitly approve start of work.
+
+In-scope (must gate): new System or Remote, combat/motion, economy/loot, save fields, ≥3 modules, anything that could hit §1.6 or §1.7. Exempt: typos/comments, formatting with no behavior change, single-file mechanical fixes that do not touch authority, writers, Remote, or save. When unsure, gate.
+
+Forbidden: treat the first draft as approval; "implement first, review later"; rubber-stamp your own plan without a verdict. User may explicitly skip the gate; still one-sentence-record residual §1.6/§1.7 risk. Docs: 结构规范 §1.8.
+
+## UtilsSystem & Requires
+- Access modules/services/remotes via `UtilsSystem`: `local Utils = require(...UtilsSystem)`.
+- **Cache every used `Utils` key at file top** (`local Log = Utils.Log`, `local SystemGameConfig = Utils.SystemGameConfig`); call by short name only. **Never** chain `Utils.Module.method(...)` in module init, functions, or business logic (exception: deferred `Utils` access to break circular deps).
+- File name must match Utils key: `SystemBag.luau` → `Utils.SystemBag`.
+- All requires at file top. No require inside functions.
+- Submodules: `require(script.SubModule)` OK.
+- **Never** bypass Utils with long paths like `require(game.ServerStorage...)`.
+- Break circular deps via Utils lazy load or refactor; do not ignore cycle warnings.
+- Multi-file System: folder + `init.luau`.
+
+## Module Design
+- Pattern: class (`new`/`destroy`), singleton service (`Init`), or stateless function library.
+- One System = one domain. Split if name implies multiple unrelated verbs.
+- Fixed file order: header → services → requires → `local Module = {}` → constants → private vars → private funcs → public funcs → Init → return.
+- `Init()`: public, Manager-only. Bind events/timers only—no version migration.
+- Never call another module's `Init()`. Use `_init()` for lazy internal init.
+- Export public API only. Private: `local function _name`, never on module table.
+- Do not expose mutable internal tables; use read-only getters or **deep copies** (`Copy.deepCopy`). Config/query APIs (`CfgFind`, `SystemGameConfig.Get`, etc.) must **never** return live references to in-memory config tables.
+- Class: `new()` + `destroy()`. Disconnect all connections in `destroy()` or on player leave.
+- Split files with >500 effective code lines (exclude pure comment and blank lines) or duplicate logic >2 places when reasonable.
+
+## Naming
+- camelCase: vars/functions. UPPER_SNAKE_CASE: constants/error codes.
+- PascalCase: modules/classes/files. `_prefix`: private members.
+- Roblox var: camelCase; Instance.Name: PascalCase.
+- Prefixes: Get/Find (query), Set/Update (modify), Add/Remove (collection), Is/Has/Can (bool), On (handler), Init (once).
+- Names describe action, not trigger/source. Lifecycle cleanup: `destroy()`.
+
+## Comments
+- Explain **why** and non-obvious constraints, not what code does.
+- System/ToolSystem/complex modules/Manager: **required** `--[[ ]]` file header with `Module`, `Description`, `Author`, `Created`, `Last Modified` (dates: `YYYY-MM-DD`). `Module` must match file and table name. ToolBasic stateless libs <80 lines may omit.
+- **P0 — File header `Author`:** for modules the user owns or designates (new modules, or when the user explicitly asks to set/update headers), `Author` **must** be the repo Git username from `git config user.name` (local overrides global). Treat mismatch / tool names as **must-fix** (review P0 / 🔴). **Forbidden:** `Agent`, `Cursor`, `AI`, or other tool/assistant names. If `user.name` is empty/unset: stop and ask the user to configure Git identity—do not invent a name. When creating or updating such headers, also sync `Last Modified` (`YYYY-MM-DD`). Docs: 注释规范 §2.1.0.
+- **Usage docs in file headers should be as detailed as practical** so callers can integrate without reading implementation: capabilities, relation to sibling modules (when to use which), key options/defaults/constraints, standard `Utils` load pattern, and 1–3 typical examples. Complex or multi-API modules (e.g. `AssetAcquire`) are the bar; trivial single-purpose modules may use a short `功能` list only.
+- Section dividers for long modules; optional if <80 lines.
+- **All private functions** in System/ToolSystem/complex modules/Manager: block comment with purpose; **every** `@param` / `@return` when applicable.
+- **Public API** in System/ToolSystem/Manager: block comment **required**; **every** `@param` / `@return` **required** (no exceptions for "self-explanatory" names). Prefer enough detail that callers need not read the function body.
+- **`@param` / `@return` format (mandatory):** `@param name Type - semantic description` (type + dash + meaning). Include valid values, enum refs (`EnumMgr.TipTp`), table field shapes for `any`/`table`, optional default. `@return Type - semantic description` same rule. **Forbidden:** type-only (`@param player Player`), name-only, or missing `-` description.
+- Inline: reason/constraints only. No dead commented code. TODO: `-- TODO(author, date): msg`.
+
+## Communication
+- Client→Server Remote: route only via `NetWorkManager`. Systems provide handlers; never bind Remote in System.
+- Server validation order: player valid → data valid → business state → rate limit → anomaly check.
+- Client data is untrusted; always re-validate on server.
+- Prefer direct calls (same side); BindableEvent for decoupled same-side broadcast.
+- RemoteFunction: rare; wrap in pcall; check player online; avoid blocking critical paths.
+- No BindableEvent for cross-side or to replace simple direct calls.
+
+## Data & Save
+- All DataStore access via `SystemDataStore`; player session changes via `SystemSave.ChangeStat`; force save on player leave.
+- Structure fill (missing fields from SaveMetaData): OK in SystemSave load flow only.
+- ServerStateSync modules (`SystemGlobalData`, `SystemServerBuff`, `SystemRank`) may write workspace mirrors; no direct DataStore outside `SystemDataStore`.
+- Version migration: only in `FixData.luau` by version—never in System `Init()` or PlayerAdded.
+- No non-serializable values in save (Instance, Vector3, functions, cycles). Nesting ≤4 levels preferred.
+
+## Code Style
+- Guard clauses first; avoid deep nesting.
+- Returns: mutating → `true` / `false, ERROR_CODE`; query → data/nil; bool → true/false. Be consistent per API.
+- Remote handlers: silent fail + Log; don't leak internal errors to client.
+- >3 branches on same var → lookup table (unless range checks or ≤3 stable branches).
+- Functions >80 lines: consider split. Cache services/modules at top; no `Utils.X` chains in logic.
+- No magic numbers/strings; use `EnumMgr`, `CfgFind`, `GlobalConfig`.
+- Critical server ops: pcall + Log; never empty pcall swallow.
+
+## Performance
+- Event-driven over `while true do wait()`. Use `task.spawn`/`task.defer`, not deprecated spawn/wait.
+- No `Instance.new` in combat loops/Heartbeat; use pools for frequent create/destroy.
+- No GetChildren/FindFirstChild in hot loops; cache refs, maintain via ChildAdded/Removed.
+- Disconnect all connections on destroy/player leave.
+
+## Localization
+- Player-facing copy must go through `TranslationHelper.SetText` / `TranslateByKey`. Numbers and player names: `SetRawText` / `SetText_UnTrans`.
+- Keys at the call site: string literals or config `Zh*` fields only (`ZhName`, `ZhDes`). Forbidden: `cfg.Des`, self-built `KEYS[x]`, assign-then-pass.
+- New keys: same change writes `config/Localization/LocalizationTable.xlsx` (zh-cn + en-us). Untranslated cells: `/e` prefix. **Never** hand-edit `Language.luau` or `ConfigInstance.luau` (Excel hook generates them).
+- Variable numbers use `{1}`; do not use `SetText` 4th arg `addText`. Static UI: CollectionService tag `本地化`, `Name` = Key.
+- Docs: `docs/文本本地化开发规范.md`.
+
+## File Encoding & Line Endings
+- All source files with Chinese comments/strings: **UTF-8 without BOM**; match project/editor default (`files.encoding: utf8`).
+- **Line endings: LF only** (`\n`). Do not use CRLF. Enforced via `.editorconfig` (`end_of_line = lf`), `.gitattributes` (`eol=lf`), and `.vscode/settings.json` (`files.eol: "\n"`).
+- On Windows, when creating or rewriting files containing CJK text, **explicitly write UTF-8**—do not rely on default system encoding (GBK/ANSI). Prefer shell with explicit encoding over blind file writes that may turn Chinese into `?`.
+- After writing, **read back and verify** Chinese is intact (comments, `Instance.Name`, UI strings, log messages)—not just line count or diff shape.
+- If garbled: `???????` = write-time encoding loss (chars replaced); `æœç"å™¨` = UTF-8 opened/saved with wrong encoding. Fix by re-saving as UTF-8; do not propagate corrupted text.
+- Example (PowerShell, UTF-8 no BOM):
+```powershell
+[System.IO.File]::WriteAllText($path, $content, [System.Text.UTF8Encoding]::new($false))
+```
