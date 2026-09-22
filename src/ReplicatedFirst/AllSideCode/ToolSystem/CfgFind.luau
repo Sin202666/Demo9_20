@@ -3,10 +3,10 @@
 	Description: 配置表查询工具（按 ID/标签/表名查找）；对外一律返回深拷贝，禁止泄漏 ConfigInstance 原表
 	Author: 林奥宇
 	Created: 2026-07-02
-	Last Modified: 2026-09-04
+	Last Modified: 2026-09-22
 
 	功能：
-	- FindCfgByID：按物品 ID + 可选 ItemType 查配置行（item / pet / petegg / gamepass / skill / mount 等）
+	- FindCfgByID：按物品 ID + 可选 ItemType 查配置行（item / pet / petegg / gamepass / skill / mount / anime 等）
 	- 商城：按 passID、GiftID、OnlyTag 查 itemshopdataConf（启动时建索引，O(1)）
 	- GetCfgByName / GetCfgByNameAndID：按 ConfigInstance 表名（及行 ID）取整表或单行
 	- GetDailyAward：按轮次 + 天数取签到奖励；GetNowVisionCfg：取 UpdateTime 最新的更新日志行
@@ -95,12 +95,14 @@ local _onlineawardConf = ConfigInstance.onlineawardConf
 local _gamepassitemConf = ConfigInstance.gamepassitemConf
 local _skillConf = ConfigInstance.skillConf
 local _mountConf = ConfigInstance.mountConf
+local _animeConf = ConfigInstance.animeConf
 
 -- ItemType → 配置表（多类型可指向同一表）；新增类型只改本表
 local _ITEM_TYPE_TO_CONF = {
 	[EnumMgr.ItemType.Item] = _itemdataConf,
 	[EnumMgr.ItemType.UseItem] = _itemdataConf,
 	[EnumMgr.ItemType.Title] = _itemdataConf,
+	[EnumMgr.ItemType.Anime] = _animeConf,
 	[EnumMgr.ItemType.Pet] = _petConf,
 	[EnumMgr.ItemType.PetEgg] = _peteggConf,
 	[EnumMgr.ItemType.GamePass] = _gamepassitemConf,
@@ -116,6 +118,7 @@ local _FALLBACK_CONF_ORDER = {
 	_skillConf,
 	_gamepassitemConf,
 	_mountConf,
+	_animeConf,
 }
 
 -- 商城 O(1) 索引（内部持有内存行引用，出口再拷贝）
