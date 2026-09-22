@@ -87,6 +87,7 @@ EnumMgr.ItemID = {
 EnumMgr.ItemType = {
 	Item = 0,--普通消耗物品
 	UseItem = 1,--可使用物品
+	Anime = 2,--动漫角色
 	Title = 5,--称号（itemdataConf.tp）
 	GamePass = 3,--通行证
 	Pet = 4,--宠物

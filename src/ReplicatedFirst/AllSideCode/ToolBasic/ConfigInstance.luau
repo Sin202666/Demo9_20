@@ -1,6 +1,7 @@
 
 local ConfigInstance ={}
 ConfigInstance.key={
+animeConf={"xyd","tp","ZhName","Model","Atk","Hp"},
 buffdataConf={"isShow","ZhName","buffName","isOver","des","addPower","Icon"},
 codeConf={"code","codeType","startTime","endTime","rewardId","rewardNum"},
 dailyawardConf={"index","week","AwardID","CountID","BtnColor","BtnIcon"},
@@ -16,6 +17,15 @@ settingConf={"ZhName","ShowName","SetType","TempType","set","range","isPecent","
 skillConf={"ZhName","ScriptName","","","Icon","Priority","Range","EffectTarget","needCheck","isBase","exp","","ElementTp","AttackEffectPos","CD","DamageRate","","buffs","","","","ForceHitAnimation","Size","Band","SummonBand"},
 updatelogConf={"UpdateTime","ZhTagTitle","ZhUpdateText"},
 weaponConf={"tp","ZhName","Model","Damage","Icon","Sort","Price","InShop","xyd"},
+}
+
+ConfigInstance.animeConf={
+	[2001001]={2,2,"2年后路飞","2年后路飞",1,10},
+	[2001002]={3,2,"Cloud","Cloud",2,20},
+	[2001003]={4,2,"Mezuko","Mezuko",3,30},
+	[2001004]={2,2,"Minato","Minato",4,40},
+	[2001005]={3,2,"Mr.3","Mr.3",5,50},
+	[2001006]={4,2,"Panroji Ritsuri","Panroji Ritsuri",6,60}
 }
 
 ConfigInstance.buffdataConf={
