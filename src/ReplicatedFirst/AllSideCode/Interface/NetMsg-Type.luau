@@ -61,6 +61,12 @@ module.MOUNT_SYNC_STATE = "MountSyncState"
 module.MOUNT_FORCE_EXIT = "MountForceExit"
 module.MOUNT_SESSION_CHANGED = "MountSessionChanged"
 
+module.AUTO_BATTLE_REQ_START = "AutoBattleReqStart"
+module.AUTO_BATTLE_REQ_ABORT = "AutoBattleReqAbort"
+module.AUTO_BATTLE_SYNC_STATE = "AutoBattleSyncState"
+module.AUTO_BATTLE_BATTLE_END = "AutoBattleBattleEnd"
+module.AUTO_BATTLE_SESSION_CHANGED = "AutoBattleSessionChanged"
+
 module.BAG_LOCK_ITEMS = "锁定物品"
 module.BACKPACK_TOOLBAR_DRAG = "背包工具栏拖拽"
 

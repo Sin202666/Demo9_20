@@ -3,7 +3,7 @@
 	Description: DebugSystem 已知翻译键的字面量查表（Caption / 输入组）
 	Author: 林奥宇
 	Created: 2026-09-01
-	Last Modified: 2026-09-01
+	Last Modified: 2026-09-22
 
 	功能：
 	- applyButtonText：TextButton 子 Caption 走 SetText（TranslationHelper 不支持 TextButton 本身）
@@ -71,6 +71,10 @@ function DebugI18n.applyButtonText(button: TextButton, key: string)
 		TranslationHelper.SetText(label, "初始化角色数据")
 	elseif key == "短视频界面" then
 		TranslationHelper.SetText(label, "短视频界面")
+	elseif key == "自动战斗" then
+		TranslationHelper.SetText(label, "自动战斗")
+	elseif key == "中止自动战斗" then
+		TranslationHelper.SetText(label, "中止自动战斗")
 	else
 		Log.warn("[DebugSystem] unknown button key:", key)
 		label.Text = key

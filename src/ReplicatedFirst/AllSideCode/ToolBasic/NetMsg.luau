@@ -3,11 +3,11 @@
 	Description: 游戏通信 msgName 常量表，避免字符串拼写错误
 	Author: 林奥宇
 	Created: 2026-07-02
-	Last Modified: 2026-09-04
+	Last Modified: 2026-09-22
 
 	功能：
 	- RemoteEvent / RemoteFunction / Bindable 的 msgName 常量
-	- 技能、逻辑怪、坐骑等通道消息名与 NetWork 注册名对齐
+	- 技能、逻辑怪、坐骑、自动战斗等通道消息名与 NetWork 注册名对齐
 
 	加载方式：
 		local Utils = require(game.ReplicatedFirst.AllSideCode.UtilsSystem)
@@ -104,6 +104,13 @@ NetMsg.MOUNT_REQ_EXIT = "MountReqExit"
 NetMsg.MOUNT_SYNC_STATE = "MountSyncState"
 NetMsg.MOUNT_FORCE_EXIT = "MountForceExit"
 NetMsg.MOUNT_SESSION_CHANGED = "MountSessionChanged"
+
+-- 自动战斗域（Default 通道 / AutoBattleNet）
+NetMsg.AUTO_BATTLE_REQ_START = "AutoBattleReqStart"
+NetMsg.AUTO_BATTLE_REQ_ABORT = "AutoBattleReqAbort"
+NetMsg.AUTO_BATTLE_SYNC_STATE = "AutoBattleSyncState"
+NetMsg.AUTO_BATTLE_BATTLE_END = "AutoBattleBattleEnd"
+NetMsg.AUTO_BATTLE_SESSION_CHANGED = "AutoBattleSessionChanged"
 
 NetMsg.BAG_LOCK_ITEMS = "锁定物品"
 NetMsg.BACKPACK_TOOLBAR_DRAG = "背包工具栏拖拽"

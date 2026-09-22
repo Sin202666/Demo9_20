@@ -395,6 +395,9 @@ function ModuleRegistry.Create(ctx: RegistryContext): Registries
 		MountNet = function()
 			return _getModuleInstance(systemPath, "MountNet")
 		end,
+		AutoBattleNet = function()
+			return _getModuleInstance(systemPath, "AutoBattleNet")
+		end,
 		AddListen = function()
 			return _getModuleInstance(systemPath, "AddListen")
 		end,

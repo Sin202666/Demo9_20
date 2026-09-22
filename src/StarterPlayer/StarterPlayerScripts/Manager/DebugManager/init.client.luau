@@ -3,12 +3,13 @@
 	Description: 客户端调试编排，绑定 DebugSystem UI 回调并通过 NetWork 发 Remote
 	Author: 林奥宇
 	Created: 2026-01-29
-	Last Modified: 2026-09-04
+	Last Modified: 2026-09-22
 
 	功能：
 	- Dev / Studio 环境下加载调试 UI（DebugSystem）
 	- 背包增删清、记录修改、数据初始化等操作发 Remote 至服务端
 	- 短视频启用时注册「短视频界面」按钮，开关 2D 播放界面
+	- 自动战斗启用时注册「自动战斗」/「中止自动战斗」按钮
 
 	与相关模块：
 	- DebugSystem：UI 与输入；本 Manager 只绑回调、发 Remote
@@ -90,6 +91,22 @@ local InitButtonVt = {
 		end,
 	},
 }
+
+if SystemGameConfig.GetValue({ "自动战斗", "启用" }) ~= false then
+	local SystemAutoBattle = Utils.SystemAutoBattle
+	table.insert(InitButtonVt, {
+		{ Name = "自动战斗" },
+		function()
+			SystemAutoBattle.RequestStart()
+		end,
+	})
+	table.insert(InitButtonVt, {
+		{ Name = "中止自动战斗" },
+		function()
+			SystemAutoBattle.RequestAbort()
+		end,
+	})
+end
 
 if SystemGameConfig.GetValue({ "短视频", "启用" }) ~= false then
 	local shortVideoFolder = ReplicatedStorage:FindFirstChild("ShortVideoFeature")
