@@ -10,6 +10,8 @@ export type CatalogEnum = {
 	LightingConfig: string,
 	LightingStates: string,
 	Tips: string,
+	AllGridients: string,
+	Map: string,
 }
 
 export type ModelCategoryEnum = {

@@ -4,7 +4,7 @@
 	Description: 资源 catalog 与 ModelRes 子分类的配置表，并提供相对路径字符串拼接
 	Author: 中台组
 	Created: 2026-07-01
-	Last Modified: 2026-08-27
+	Last Modified: 2026-09-23
 
 	功能：
 	- 定义 Assets 下一级 catalog 名称（Catalog）
@@ -93,6 +93,7 @@ AssetRegistry.Catalog = table.freeze({
 	LightingStates = "LightingStates",
 	Tips = "Tips",
 	AllGridients = "AllGridients",
+	Map = "Map",
 })
 
 AssetRegistry.ModelCategory = table.freeze({
